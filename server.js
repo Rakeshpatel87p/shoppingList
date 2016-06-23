@@ -6,11 +6,22 @@ var Storage = function() {
 };
 
 Storage.prototype.add = function(name) {
-    var item = {name: name, id: this.id};
+    var item = { name: name, id: this.id };
     this.items.push(item);
     this.id += 1;
     return item;
 };
+
+Storage.prototype.delete = function(positionOfObject) {
+    this.items.splice(positionOfObject, 1);
+    for(i = 0; i < storage.items.length; i++){
+        this.items[i].id = i;
+    }; 
+}
+
+Storage.prototype.edit = function(positionOfObject, editedName){
+    this.items[positionOfObject].name = editedName;
+}
 
 var storage = new Storage();
 storage.add('Broad beans');
@@ -36,18 +47,33 @@ app.post('/items', jsonParser, function(req, res) {
     res.status(201).json(item);
 });
 
-app.delete('/items/:id', jsonParser, function(req, res){
-    var id = req.params.items.id;    
+// When to use jsonParser? Necessary here? For put?
+app.delete('/items/:id', jsonParser, function(req, res) {
+    var id = req.params.id;
+    var positionOfObject = findObject(id);
+    storage.delete(positionOfObject);
+    // What does this .json do?
+    res.status(200).json({});
 
-    // var itemToDelete = storage.items.filter(function(obj){
-    //     return obj.id == req.body.params.items.id
-    // })
-    // console.log(itemToDelete);
-    // app.get('/items', function(req, res) {
-    //     res.json(itemToDelete)
-// });
-    
 });
+
+app.put('items/:id', jsonParser, function(req, res){
+    var id = req.params.id;
+    var positionOfObject = findObject(id);
+    storage.edit(positionOfObject, req.body.name);
+    res.json({});
+
+});
+
+var findObject = function(id) {
+    for (var i = 0; i < storage.items.length; i++) {
+        if (storage.items[i].id == id) {
+            return i
+        }
+    }
+    return -1
+
+}
 
 app.listen(process.env.PORT || 8080);
 
