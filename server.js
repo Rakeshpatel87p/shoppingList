@@ -14,13 +14,11 @@ Storage.prototype.add = function(name) {
 
 Storage.prototype.delete = function(positionOfObject) {
     this.items.splice(positionOfObject, 1);
-    for(i = 0; i < storage.items.length; i++){
-        this.items[i].id = i;
-    }; 
-}
+};
 
-Storage.prototype.edit = function(positionOfObject, editedName){
+Storage.prototype.edit = function(positionOfObject, editedName) {
     this.items[positionOfObject].name = editedName;
+    // return this.items[positionOfObject];
 }
 
 var storage = new Storage();
@@ -35,6 +33,12 @@ app.get('/items', function(req, res) {
     res.json(storage.items);
 });
 
+app.get('/items/:id', function(req, res){
+    var id = req.params.id;
+    var getID = findObject(id);
+    res.json(storage.items[getID]);
+})
+
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 
@@ -48,20 +52,20 @@ app.post('/items', jsonParser, function(req, res) {
 });
 
 // When to use jsonParser? Necessary here? For put?
-app.delete('/items/:id', jsonParser, function(req, res) {
+app.delete('/items/:id', function(req, res) {
     var id = req.params.id;
     var positionOfObject = findObject(id);
     storage.delete(positionOfObject);
     // What does this .json do?
-    res.status(200).json({});
+    res.status(200).json({message: "successfully deleted", status: "ok"});
 
 });
 
-app.put('items/:id', jsonParser, function(req, res){
+app.put('/items/:id', jsonParser, function(req, res) {
     var id = req.params.id;
     var positionOfObject = findObject(id);
-    storage.edit(positionOfObject, req.body.name);
-    res.json({});
+    var updatedName = storage.edit(positionOfObject, req.body.name);
+    res.json(updatedName);
 
 });
 
