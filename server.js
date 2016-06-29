@@ -18,7 +18,7 @@ Storage.prototype.delete = function(positionOfObject) {
 
 Storage.prototype.edit = function(positionOfObject, editedName) {
     this.items[positionOfObject].name = editedName;
-    // return this.items[positionOfObject];
+
 }
 
 var storage = new Storage();
@@ -56,7 +56,6 @@ app.delete('/items/:id', function(req, res) {
     var id = req.params.id;
     var positionOfObject = findObject(id);
     storage.delete(positionOfObject);
-    // What does this .json do?
     res.status(200).json({message: "successfully deleted", status: "ok"});
 
 });
@@ -65,7 +64,7 @@ app.put('/items/:id', jsonParser, function(req, res) {
     var id = req.params.id;
     var positionOfObject = findObject(id);
     var updatedName = storage.edit(positionOfObject, req.body.name);
-    res.json(updatedName);
+    // res.status(200).json(updatedName);
 
 });
 
@@ -81,5 +80,5 @@ var findObject = function(id) {
 
 app.listen(process.env.PORT || 8080);
 
-// exports.app = app;
-// exports.storage = storage;
+exports.app = app;
+exports.storage = storage;
